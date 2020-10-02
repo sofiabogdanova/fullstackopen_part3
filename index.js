@@ -43,23 +43,19 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    if (!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
-
     const person = new Person({
         name: body.name,
         number: body.number
     });
 
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson => {
+            response.json(savedPerson)
+        })
+        .catch(error=>next(error))
 })
 
-app.put('/api/persons/:id', (request, response, next)  => {
+app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
 
     const person = {
@@ -67,7 +63,7 @@ app.put('/api/persons/:id', (request, response, next)  => {
         number: body.number,
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -76,7 +72,7 @@ app.put('/api/persons/:id', (request, response, next)  => {
 
 app.get('/api/info', (request, response) => {
     const receivedDate = new Date();
-    const personsLength = Person.find({})
+    Person.find({})
         .then(result => {
             const infoMessage = `Phonebook has info for ${result.length} people \n \n ${receivedDate}`;
             response.send(infoMessage);
